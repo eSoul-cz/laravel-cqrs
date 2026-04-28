@@ -7,13 +7,11 @@ namespace Esoul\LaravelCqrs\Console\Commands;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
-use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\multiselect;
-
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\multiselect;
 
 #[AsCommand('make:cqrs-command')]
 class CommandMakeCommand extends GeneratorCommand
@@ -46,7 +44,7 @@ class CommandMakeCommand extends GeneratorCommand
                 return false;
             }
 
-            if (!confirm('Do you want to generate additional components for the model?')) {
+            if (!confirm('Do you want to generate additional components for the command?')) {
                 return false;
             }
 

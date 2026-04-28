@@ -7,7 +7,10 @@ namespace Esoul\LaravelCqrs\Console\Commands;
 use Esoul\Cqrs\Contracts\QueryInterface;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand('make:cqrs-query-handler')]
 class QueryHandlerMakeCommand extends GeneratorCommand
@@ -17,7 +20,7 @@ class QueryHandlerMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:cqrs-query-handler {name} {--query : Command for which to create the handler} {--force : Overwrite existing files} {--return= : Return type of the handler method}';
+    protected $signature = 'make:cqrs-query-handler {name} {--query= : Query for which to create the handler} {--force : Overwrite existing files} {--return= : Return type of the handler method}';
 
     /**
      * The console query description.
@@ -27,6 +30,28 @@ class QueryHandlerMakeCommand extends GeneratorCommand
     protected $description = 'Create a CQRS query handler class';
 
     protected $type = 'QueryHandler';
+
+    public function handle(): ?bool
+    {
+        try {
+            return parent::handle();
+        } catch (InvalidArgumentException $exception) {
+            $this->error($exception->getMessage());
+
+            return false;
+        }
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $result = $this->laravel->call([$this, 'handle']);
+
+        if (is_int($result)) {
+            return $result;
+        }
+
+        return $result ? self::SUCCESS : self::FAILURE;
+    }
 
     protected function getStub(): string
     {
@@ -120,12 +145,10 @@ class QueryHandlerMakeCommand extends GeneratorCommand
         $class = ltrim($class, '\\');
 
         if (!class_exists($class)) {
-            $this->error("The specified query class '{$class}' does not exist.");
-            exit(1);
+            throw new InvalidArgumentException("The specified query class '{$class}' does not exist.");
         }
         if (!is_a($class, QueryInterface::class, true)) {
-            $this->error("The specified query class '{$class}' does not implement QueryInterface.");
-            exit(1);
+            throw new InvalidArgumentException("The specified query class '{$class}' does not implement QueryInterface.");
         }
 
         return $class;
