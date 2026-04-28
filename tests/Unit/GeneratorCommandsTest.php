@@ -39,6 +39,7 @@ class GeneratorCommandsTest extends TestCase
         $this->assertFileExists($handlerPath);
         $this->assertStringContainsString('namespace Tests\\Generated\\Command;', file_get_contents($commandPath) ?: '');
         $this->assertStringContainsString('@implements CommandInterface<string>', file_get_contents($commandPath) ?: '');
+        $this->assertStringContainsString('final readonly class CreateOrderCommand implements CommandInterface', file_get_contents($commandPath) ?: '');
         $this->assertStringContainsString('namespace Tests\\Generated\\CommandHandler;', file_get_contents($handlerPath) ?: '');
         $this->assertStringContainsString('use Tests\\Generated\\Command\\CreateOrderCommand;', file_get_contents($handlerPath) ?: '');
         $this->assertStringContainsString('public function handle(CommandInterface $command) : string', file_get_contents($handlerPath) ?: '');
@@ -72,6 +73,108 @@ class GeneratorCommandsTest extends TestCase
         $this->assertStringContainsString('namespace Tests\\Generated\\QueryHandler;', file_get_contents($handlerPath) ?: '');
         $this->assertStringContainsString('use Tests\\Generated\\Query\\FindOrderQuery;', file_get_contents($handlerPath) ?: '');
         $this->assertStringContainsString('public function handle(QueryInterface $query): array', file_get_contents($handlerPath) ?: '');
+    }
+
+    public function test_make_cqrs_command_handler_accepts_command_option_value(): void
+    {
+        $app = $this->createApplication();
+        $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
+        $this->registerPsr4Autoloader([
+            'Tests\\Generated\\Command\\' => $app['config']->get('cqrs.commands.path'),
+            'Tests\\Generated\\CommandHandler\\' => $app['config']->get('cqrs.command_handlers.path'),
+        ]);
+
+        $artisan = $this->makeGeneratorArtisan($app);
+        $artisan->call('make:cqrs-command', [
+            'name' => 'ShipOrder',
+            '--return' => 'string',
+            '--no-interaction' => true,
+        ]);
+
+        $exitCode = $artisan->call('make:cqrs-command-handler', [
+            'name' => 'ShipOrderHandler',
+            '--command' => 'ShipOrderCommand',
+            '--return' => 'string',
+            '--no-interaction' => true,
+        ]);
+
+        $handlerPath = $app['config']->get('cqrs.command_handlers.path') . '/ShipOrderHandler.php';
+
+        $this->assertSame(0, $exitCode);
+        $this->assertFileExists($handlerPath);
+        $this->assertStringContainsString('use Tests\\Generated\\Command\\ShipOrderCommand;', file_get_contents($handlerPath) ?: '');
+    }
+
+    public function test_make_cqrs_query_handler_accepts_query_option_value(): void
+    {
+        $app = $this->createApplication();
+        $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
+        $this->registerPsr4Autoloader([
+            'Tests\\Generated\\Query\\' => $app['config']->get('cqrs.queries.path'),
+            'Tests\\Generated\\QueryHandler\\' => $app['config']->get('cqrs.query_handlers.path'),
+        ]);
+
+        $artisan = $this->makeGeneratorArtisan($app);
+        $artisan->call('make:cqrs-query', [
+            'name' => 'LookupOrder',
+            '--return' => 'array',
+            '--no-interaction' => true,
+        ]);
+
+        $exitCode = $artisan->call('make:cqrs-query-handler', [
+            'name' => 'LookupOrderHandler',
+            '--query' => 'LookupOrderQuery',
+            '--return' => 'array',
+            '--no-interaction' => true,
+        ]);
+
+        $handlerPath = $app['config']->get('cqrs.query_handlers.path') . '/LookupOrderHandler.php';
+
+        $this->assertSame(0, $exitCode);
+        $this->assertFileExists($handlerPath);
+        $this->assertStringContainsString('use Tests\\Generated\\Query\\LookupOrderQuery;', file_get_contents($handlerPath) ?: '');
+    }
+
+    public function test_make_cqrs_command_handler_fails_cleanly_for_invalid_command_class(): void
+    {
+        $app = $this->createApplication();
+        $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
+        $this->registerPsr4Autoloader([
+            'Tests\\Generated\\Command\\' => $app['config']->get('cqrs.commands.path'),
+            'Tests\\Generated\\CommandHandler\\' => $app['config']->get('cqrs.command_handlers.path'),
+        ]);
+
+        $artisan = $this->makeGeneratorArtisan($app);
+        $exitCode = $artisan->call('make:cqrs-command-handler', [
+            'name' => 'BrokenHandler',
+            '--command' => 'MissingCommand',
+            '--return' => 'string',
+            '--no-interaction' => true,
+        ]);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString("The specified command class 'Tests\\Generated\\Command\\MissingCommand' does not exist.", $artisan->output());
+    }
+
+    public function test_make_cqrs_query_handler_fails_cleanly_for_invalid_query_class(): void
+    {
+        $app = $this->createApplication();
+        $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
+        $this->registerPsr4Autoloader([
+            'Tests\\Generated\\Query\\' => $app['config']->get('cqrs.queries.path'),
+            'Tests\\Generated\\QueryHandler\\' => $app['config']->get('cqrs.query_handlers.path'),
+        ]);
+
+        $artisan = $this->makeGeneratorArtisan($app);
+        $exitCode = $artisan->call('make:cqrs-query-handler', [
+            'name' => 'BrokenHandler',
+            '--query' => 'MissingQuery',
+            '--return' => 'array',
+            '--no-interaction' => true,
+        ]);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString("The specified query class 'Tests\\Generated\\Query\\MissingQuery' does not exist.", $artisan->output());
     }
 
     /**
