@@ -17,6 +17,6 @@ final class {{ class }} implements QueryHandlerInterface
     public function handle(QueryInterface $query): {{ return }}
     {
         // TODO: Implement handle() method.
-        return null;
+        throw new \LogicException('Not implemented.');
     }
 }

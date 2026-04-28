@@ -17,6 +17,6 @@ final class {{ class }} implements CommandHandlerInterface
     public function handle(CommandInterface $command) : {{ return }}
     {
         // TODO: Implement handle() method.
-        return null;
+        throw new \LogicException('Not implemented.');
     }
 }
