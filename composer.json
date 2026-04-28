@@ -1,0 +1,59 @@
+{
+  "name": "esoul/laravel-cqrs",
+  "description": "Laravel simple CQRS implementation",
+  "type": "library",
+  "license": "gpl-2.0-or-later",
+  "authors": [
+    {
+      "name": "Tomáš Vojík",
+      "email": "vojik@esoul.cz"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.esoul.cz"
+    }
+  ],
+  "require": {
+    "php": ">=8.5",
+    "spatie/laravel-package-tools": "^1.16.1",
+    "illuminate/support": "^10.2|^11.0|^12.0|^13.0"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2",
+    "laravel/pail": "^1.2.2",
+    "laravel/pint": "^1.13",
+    "laravel/framework": "^12.48",
+    "phpunit/phpunit": "^13.1",
+    "esoul/cqrs": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Esoul\\LaravelCqrs\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "phpstan": "./vendor/bin/phpstan",
+    "phpcs": "./vendor/bin/pint --test",
+    "cs": "./vendor/bin/pint --test",
+    "phpcbf": "./vendor/bin/pint",
+    "cbf": "./vendor/bin/pint"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "extra": {
+    "laravel": {
+      "providers": [
+        "LaravelCqrsServiceProvider"
+      ],
+      "aliases": {
+      }
+    }
+  }
+}
