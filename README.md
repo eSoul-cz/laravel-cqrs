@@ -1,6 +1,6 @@
 # Laravel CQRS
 
-Laravel integration for [`esoul/cqrs`](https://github.com/eSoul-cz/cqrs). The package wires the command bus and query bus into the Laravel container, supports handler auto-discovery, and adds artisan generators for commands, queries, and their handlers.
+Laravel integration for [`esoul-cz/cqrs`](https://github.com/eSoul-cz/cqrs). The package wires the command bus and query bus into the Laravel container, supports handler auto-discovery, and adds artisan generators for commands, queries, and their handlers.
 
 ## Requirements
 
@@ -9,17 +9,10 @@ Laravel integration for [`esoul/cqrs`](https://github.com/eSoul-cz/cqrs). The pa
 
 ## Installation
 
-If you install from the private package registry, add the repository to `composer.json`:
+Install directly from Packagist:
 
-```json
-{
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https://packages.esoul.cz"
-    }
-  ]
-}
+```bash
+composer require esoul-cz/laravel-cqrs
 ```
 
 Or install directly from GitHub:
@@ -33,12 +26,6 @@ Or install directly from GitHub:
     }
   ]
 }
-```
-
-Then require the package:
-
-```bash
-composer require esoul/laravel-cqrs
 ```
 
 Publish the configuration:
@@ -334,4 +321,4 @@ php artisan make:cqrs-query FindOrder --handler --return='array{id:int,number:st
 - Discovery and manual registration can be used together.
 - Facades are class-based only; no alias is registered automatically.
 - If no handler is registered for a dispatched command or executed query, the underlying bus throws a runtime exception.
-- Handler discovery depends on the `esoul/cqrs` attributes, so handlers must be annotated correctly.
+- Handler discovery depends on the `esoul-cz/cqrs` attributes, so handlers must be annotated correctly.
