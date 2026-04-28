@@ -77,7 +77,7 @@ class CommandHandlerMakeCommand extends GeneratorCommand
             ? rtrim($path, DIRECTORY_SEPARATOR)
             : app_path('Domain/CQRS/Command');
 
-        return $basePath . str_replace('\\', '/', $name) . '.php';
+        return $basePath . DIRECTORY_SEPARATOR . ltrim(str_replace('\\', '/', $name), DIRECTORY_SEPARATOR) . '.php';
     }
 
     protected function getNameInput(): string
