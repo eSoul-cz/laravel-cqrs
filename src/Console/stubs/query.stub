@@ -1,0 +1,21 @@
+<?php
+
+namespace {{ namespace }};
+
+use Esoul\Cqrs\Contracts\QueryInterface;
+
+/**
+ * @implements QueryInterface<{{ returnType }}>
+ */
+final class {{ class }} implements QueryInterface
+{
+
+    // TODO: Implement filters
+    // private(set) ?int $filter1 = null;
+    //
+    // public function filter1(int $filter1): static {
+    //     $this->filter1 = $filter1;
+    //     return $this;
+    // }
+
+}

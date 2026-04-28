@@ -1,0 +1,22 @@
+<?php
+
+namespace {{ namespace }};
+
+use Esoul\Cqrs\Contracts\QueryInterface;
+use Esoul\Cqrs\Contracts\QueryHandlerInterface;
+use Esoul\Cqrs\Attributes\HandlesQuery;
+{{ queryUse }}
+
+#[HandlesQuery({{ query }}::class)]
+final class {{ class }} implements QueryHandlerInterface
+{
+
+    /**
+     * @param {{ query }} $query
+     */
+    public function handle(QueryInterface $query): {{ return }}
+    {
+        // TODO: Implement handle() method.
+        return null;
+    }
+}

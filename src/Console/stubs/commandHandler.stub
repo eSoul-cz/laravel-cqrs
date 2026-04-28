@@ -1,0 +1,22 @@
+<?php
+
+namespace {{ namespace }};
+
+use Esoul\Cqrs\Contracts\CommandInterface;
+use Esoul\Cqrs\Contracts\CommandHandlerInterface;
+use Esoul\Cqrs\Attributes\HandlesCommand;
+{{ commandUse }}
+
+#[HandlesCommand({{ command }}::class)]
+final class {{ class }} implements CommandHandlerInterface
+{
+
+    /**
+     * @param {{ command }} $command
+     */
+    public function handle(CommandInterface $command) : {{ return }}
+    {
+        // TODO: Implement handle() method.
+        return null;
+    }
+}

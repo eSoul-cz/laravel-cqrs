@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use Esoul\Cqrs\Contracts\CommandInterface;
+
+/**
+ * @implements CommandInterface<{{ returnType }}>
+ */
+final class {{ class }} implements CommandInterface
+{
+
+    public function __construct(
+        public mixed $property, // TODO: Implement properties
+    ){
+    }
+}
