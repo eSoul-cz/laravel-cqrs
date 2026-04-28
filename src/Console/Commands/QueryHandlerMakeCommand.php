@@ -35,6 +35,7 @@ class QueryHandlerMakeCommand extends GeneratorCommand
     {
         try {
             return parent::handle();
+            /** @phpstan-ignore catch.neverThrown */
         } catch (InvalidArgumentException $exception) {
             $this->error($exception->getMessage());
 
