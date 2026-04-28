@@ -44,84 +44,16 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        /** @var array{enabled?:bool, cache_dir?:string, paths?:array<string, array{base_namespace?:string, path?:string}>|null}|null $discoveryConfig */
-        $discoveryConfig = config('cqrs.discovery');
-
-        $discover = false;
-        $cacheDirectory = storage_path('framework/cache/cqrs/discovery');
-        $discoverPaths = [];
-        if (is_array($discoveryConfig)) {
-            $discover = $discoveryConfig['enabled'] ?? true;
-            $cacheDirectory = $discoveryConfig['cache_dir'] ?? $cacheDirectory;
-
-            // Validate and prepare discovery paths
-            if (array_key_exists('paths', $discoveryConfig) && is_array($discoveryConfig['paths'])) {
-                foreach ($discoveryConfig['paths'] as $key => $config) {
-                    if (isset($config['base_namespace'], $config['path'])) {
-                        $discoverPaths[] = [
-                            'base_namespace' => rtrim($config['base_namespace'], '\\'),
-                            'path' => rtrim($config['path'], DIRECTORY_SEPARATOR),
-                        ];
-                    } else {
-                        throw new InvalidArgumentException("Invalid discovery configuration for path '{$key}': missing 'base_namespace' or 'path'");
-                    }
-                }
-            }
-        }
+        [
+            'discover' => $discover,
+            'cacheDirectory' => $cacheDirectory,
+            'paths' => $discoverPaths,
+        ] = $this->getDiscoveryConfig();
 
         // Prepare manual registrations for command and query handlers
-        $commandsRegister = config('cqrs.commands.register', []);
-        if (!is_array($commandsRegister)) {
-            throw new InvalidArgumentException('Invalid configuration: commands.register must be an array');
-        }
+        $commandsRegister = $this->loadManualRegistrations('commands');
+        $queriesRegister = $this->loadManualRegistrations('queries');
 
-        // Validate the array<class-string<CommandInterface>, class-string<CommandHandlerInterface>> structure
-        foreach ($commandsRegister as $commandClass => $handlerClass) {
-            if (!is_string($commandClass) || !is_string($handlerClass)) {
-                throw new InvalidArgumentException('Invalid command registration: both command and handler must be class strings');
-            }
-            if (!class_exists($commandClass)) {
-                throw new InvalidArgumentException("Command class '{$commandClass}' does not exist");
-            }
-            if (!class_exists($handlerClass)) {
-                throw new InvalidArgumentException("Command handler class '{$handlerClass}' does not exist");
-            }
-            if (!is_subclass_of($commandClass, CommandInterface::class)) {
-                throw new InvalidArgumentException("Command class '{$commandClass}' must implement CommandInterface");
-            }
-            if (!is_subclass_of($handlerClass, CommandHandlerInterface::class)) {
-                throw new InvalidArgumentException("Command handler class '{$handlerClass}' must implement CommandHandlerInterface");
-            }
-        }
-
-        // Set now validated shape for phpstan
-        /** @var array<class-string<CommandInterface<mixed>>, class-string<CommandHandlerInterface>> $commandsRegister */
-        $queriesRegister = config('cqrs.queries.register', []);
-        if (!is_array($queriesRegister)) {
-            throw new InvalidArgumentException('Invalid configuration: queries.register must be an array');
-        }
-
-        // Validate the array<class-string<QueryInterface>, class-string<QueryHandlerInterface>> structure
-        foreach ($queriesRegister as $queryClass => $handlerClass) {
-            if (!is_string($queryClass) || !is_string($handlerClass)) {
-                throw new InvalidArgumentException('Invalid query registration: both query and handler must be class strings');
-            }
-            if (!class_exists($queryClass)) {
-                throw new InvalidArgumentException("Query class '{$queryClass}' does not exist");
-            }
-            if (!class_exists($handlerClass)) {
-                throw new InvalidArgumentException("Query handler class '{$handlerClass}' does not exist");
-            }
-            if (!is_subclass_of($queryClass, QueryInterface::class)) {
-                throw new InvalidArgumentException("Query class '{$queryClass}' must implement QueryInterface");
-            }
-            if (!is_subclass_of($handlerClass, QueryHandlerInterface::class)) {
-                throw new InvalidArgumentException("Query handler class '{$handlerClass}' must implement QueryHandlerInterface");
-            }
-        }
-
-        // Set now validated shape for phpstan
-        /** @var array<class-string<QueryInterface<mixed>>, class-string<QueryHandlerInterface>> $queriesRegister */
         if (!empty($cacheDirectory)) {
             Discovery::setCacheDirectory($cacheDirectory);
         }
@@ -168,5 +100,89 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
 
             return $queryBus;
         });
+    }
+
+    /**
+     * @param  'commands'|'queries'  $type
+     * @return ($type is 'commands' ? array<class-string<CommandInterface<mixed>>, class-string<CommandHandlerInterface>> : array<class-string<QueryInterface<mixed>>, class-string<QueryHandlerInterface>>)
+     */
+    private function loadManualRegistrations(string $type): array
+    {
+        if (!in_array($type, ['commands', 'queries'], true)) {
+            throw new InvalidArgumentException("Invalid type '{$type}' for manual registrations. Expected 'commands' or 'queries'.");
+        }
+
+        $interface = $type === 'commands' ? CommandInterface::class : QueryInterface::class;
+        $handlerInterface = $type === 'commands' ? CommandHandlerInterface::class : QueryHandlerInterface::class;
+
+        $config = config('cqrs.' . $type . '.register', []);
+        if (!is_array($config)) {
+            throw new InvalidArgumentException('Invalid configuration: queries.register must be an array');
+        }
+
+        // Validate the array<class-string<QueryInterface>, class-string<QueryHandlerInterface>> structure
+        foreach ($config as $queryClass => $handlerClass) {
+            if (!is_string($queryClass) || !is_string($handlerClass)) {
+                throw new InvalidArgumentException('Invalid query registration: both query and handler must be class strings');
+            }
+            if (!class_exists($queryClass)) {
+                throw new InvalidArgumentException("Class '{$queryClass}' does not exist");
+            }
+            if (!class_exists($handlerClass)) {
+                throw new InvalidArgumentException("Handler class '{$handlerClass}' does not exist");
+            }
+            if (!is_subclass_of($queryClass, $interface)) {
+                throw new InvalidArgumentException("Class '{$queryClass}' must implement '{$interface}'");
+            }
+            if (!is_subclass_of($handlerClass, $handlerInterface)) {
+                throw new InvalidArgumentException("Handler class '{$handlerClass}' must implement '{$handlerInterface}'");
+            }
+        }
+
+        // Manually validated shape for phpstan
+        /** @phpstan-ignore return.type */
+        return $config;
+    }
+
+    /**
+     * @return array{discover:bool, cacheDirectory:string, paths:array{base_namespace:non-empty-string, path:non-empty-string}[]}
+     */
+    private function getDiscoveryConfig(): array
+    {
+        /** @var array{enabled?:bool, cache_dir?:string, paths?:array<string, array{base_namespace?:string, path?:string}>|null}|null $discoveryConfig */
+        $discoveryConfig = config('cqrs.discovery');
+
+        $discover = false;
+        $cacheDirectory = storage_path('framework/cache/cqrs/discovery');
+        /** @var array{base_namespace:non-empty-string, path:non-empty-string}[] $discoverPaths */
+        $discoverPaths = [];
+        if (is_array($discoveryConfig)) {
+            $discover = $discoveryConfig['enabled'] ?? true;
+            $cacheDirectory = $discoveryConfig['cache_dir'] ?? $cacheDirectory;
+
+            // Validate and prepare discovery paths
+            if (array_key_exists('paths', $discoveryConfig) && is_array($discoveryConfig['paths'])) {
+                foreach ($discoveryConfig['paths'] as $key => $config) {
+                    if (isset($config['base_namespace'], $config['path'])) {
+                        $namespace = rtrim($config['base_namespace'], '\\');
+                        $path = rtrim($config['path'], DIRECTORY_SEPARATOR);
+                        if (!empty($namespace) && !empty($path)) {
+                            $discoverPaths[] = [
+                                'base_namespace' => $namespace,
+                                'path' => $path,
+                            ];
+                        }
+                    } else {
+                        throw new InvalidArgumentException("Invalid discovery configuration for path '{$key}': missing 'base_namespace' or 'path'");
+                    }
+                }
+            }
+        }
+
+        return [
+            'discover' => $discover,
+            'cacheDirectory' => $cacheDirectory,
+            'paths' => $discoverPaths,
+        ];
     }
 }

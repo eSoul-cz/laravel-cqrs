@@ -119,7 +119,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         ]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Command class '" . InvalidClass::class . "' must implement CommandInterface");
+        $this->expectExceptionMessage("Class '" . InvalidClass::class . "' must implement 'Esoul\Cqrs\Contracts\CommandInterface'");
 
         $app->register(LaravelCqrsServiceProvider::class);
     }
@@ -135,7 +135,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         ]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Query handler class '" . InvalidClass::class . "' must implement QueryHandlerInterface");
+        $this->expectExceptionMessage("Handler class '" . InvalidClass::class . "' must implement 'Esoul\Cqrs\Contracts\QueryHandlerInterface'");
 
         $app->register(LaravelCqrsServiceProvider::class);
     }
