@@ -43,7 +43,8 @@
     "phpcs": "./vendor/bin/pint --test",
     "cs": "./vendor/bin/pint --test",
     "phpcbf": "./vendor/bin/pint",
-    "cbf": "./vendor/bin/pint"
+    "cbf": "./vendor/bin/pint",
+    "test": "./vendor/bin/phpunit"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
