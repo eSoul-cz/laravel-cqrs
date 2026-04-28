@@ -7,7 +7,7 @@ use Esoul\Cqrs\Contracts\CommandInterface;
 /**
  * @implements CommandInterface<{{ returnType }}>
  */
-final class {{ class }} implements CommandInterface
+final readonly class {{ class }} implements CommandInterface
 {
 
     public function __construct(
