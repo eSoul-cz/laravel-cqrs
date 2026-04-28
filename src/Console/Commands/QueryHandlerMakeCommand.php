@@ -31,10 +31,10 @@ class QueryHandlerMakeCommand extends GeneratorCommand
 
     protected $type = 'QueryHandler';
 
-    public function handle(): ?bool
+    public function handle(): bool
     {
         try {
-            return parent::handle();
+            return parent::handle() !== false;
             /** @phpstan-ignore catch.neverThrown */
         } catch (InvalidArgumentException $exception) {
             $this->error($exception->getMessage());
