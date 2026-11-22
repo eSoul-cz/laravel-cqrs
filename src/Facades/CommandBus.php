@@ -20,11 +20,10 @@ final class CommandBus extends Facade
      * @param  CommandInterface<TResult>  $command
      * @return TResult
      */
-    public static function dispatch(CommandInterface $command): mixed
-    {
+    public static function dispatch(CommandInterface $command): mixed {
         /** @var CommandBusInterface|null $instance */
         $instance = self::getFacadeRoot();
-        if (!($instance instanceof CommandBusInterface)) {
+        if ( ! ($instance instanceof CommandBusInterface)) {
             throw new RuntimeException('A facade root has not been set.');
         }
 
@@ -37,18 +36,16 @@ final class CommandBus extends Facade
      * @param  class-string<CommandInterface<TResult>>  $commandClass
      * @param  class-string<CommandHandlerInterface>  $handlerClass
      */
-    public static function registerHandler(string $commandClass, string $handlerClass): void
-    {
+    public static function registerHandler(string $commandClass, string $handlerClass): void {
         /** @var CommandBusInterface|null $instance */
         $instance = self::getFacadeRoot();
-        if (!($instance instanceof CommandBusInterface)) {
+        if ( ! ($instance instanceof CommandBusInterface)) {
             throw new RuntimeException('A facade root has not been set.');
         }
         $instance->registerHandler($commandClass, $handlerClass);
     }
 
-    protected static function getFacadeAccessor(): string
-    {
+    protected static function getFacadeAccessor(): string {
         return CommandBusInterface::class;
     }
 }

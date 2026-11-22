@@ -7,13 +7,12 @@ namespace Esoul\LaravelCqrs\Console\Commands;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
-use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\multiselect;
-
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\multiselect;
 
 #[AsCommand('make:cqrs-command')]
 class CommandMakeCommand extends GeneratorCommand
@@ -39,14 +38,13 @@ class CommandMakeCommand extends GeneratorCommand
     /**
      * Execute the console command.
      */
-    public function handle(): bool
-    {
-        if (parent::handle() === false && !$this->option('force')) {
-            if (!$this->alreadyExists($this->getNameInput())) {
+    public function handle(): bool {
+        if (parent::handle() === false && ! $this->option('force')) {
+            if ( ! $this->alreadyExists($this->getNameInput())) {
                 return false;
             }
 
-            if (!confirm('Do you want to generate additional components for the command?')) {
+            if ( ! confirm('Do you want to generate additional components for the command?')) {
                 return false;
             }
 
@@ -67,8 +65,7 @@ class CommandMakeCommand extends GeneratorCommand
         return true;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         $result = $this->laravel->call([$this, 'handle']);
 
         if (is_int($result)) {
@@ -78,13 +75,11 @@ class CommandMakeCommand extends GeneratorCommand
         return $result ? self::SUCCESS : self::FAILURE;
     }
 
-    protected function getStub(): string
-    {
+    protected function getStub(): string {
         return dirname(__DIR__) . '/stubs/command.stub';
     }
 
-    protected function rootNamespace(): string
-    {
+    protected function rootNamespace(): string {
         $namespace = config('cqrs.commands.base_namespace');
 
         return is_string($namespace) && $namespace !== ''
@@ -92,8 +87,7 @@ class CommandMakeCommand extends GeneratorCommand
             : 'App\\Domain\\CQRS\\Command';
     }
 
-    protected function getPath($name): string
-    {
+    protected function getPath($name): string {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
         $path = config('cqrs.commands.path');
@@ -104,30 +98,29 @@ class CommandMakeCommand extends GeneratorCommand
         return $basePath . DIRECTORY_SEPARATOR . ltrim(str_replace('\\', '/', $name), DIRECTORY_SEPARATOR) . '.php';
     }
 
-    protected function getNameInput(): string
-    {
+    protected function getNameInput(): string {
         $name = parent::getNameInput();
-        if (!str_ends_with($name, 'Command')) {
+        if ( ! str_ends_with($name, 'Command')) {
             $name .= 'Command';
         }
 
         return $name;
     }
 
-    protected function buildClass($name): string
-    {
+    protected function buildClass($name): string {
         $replace = $this->buildFactoryReplacements();
 
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace),
+            array_values($replace),
+            parent::buildClass($name),
         );
     }
 
     /**
      * @return array<string, string>
      */
-    protected function buildFactoryReplacements(): array
-    {
+    protected function buildFactoryReplacements(): array {
         $replacements = [];
 
         if ($this->option('return') && is_string($this->option('return'))) {
@@ -139,8 +132,7 @@ class CommandMakeCommand extends GeneratorCommand
         return $replacements;
     }
 
-    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output): void
-    {
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output): void {
         if ($this->didReceiveOptions($input) || $this->isReservedName($this->getNameInput())) {
             return;
         }
@@ -150,8 +142,8 @@ class CommandMakeCommand extends GeneratorCommand
                 'Would you like any of the following?',
                 [
                     'handler' => 'Command handler',
-                ]
-            )
+                ],
+            ),
         )
             /** @phpstan-ignore argument.type */
             ->each(fn (string $option) => $input->setOption($option, true));

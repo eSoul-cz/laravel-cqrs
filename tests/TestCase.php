@@ -27,8 +27,7 @@ abstract class TestCase extends BaseTestCase
     /** @var list<callable(string): void> */
     private array $autoloaders = [];
 
-    protected function tearDown(): void
-    {
+    protected function tearDown(): void {
         foreach ($this->autoloaders as $autoloader) {
             spl_autoload_unregister($autoloader);
         }
@@ -51,8 +50,7 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
     }
 
-    protected function createApplication(array $configOverrides = []): Application
-    {
+    protected function createApplication(array $configOverrides = []): Application {
         $basePath = sys_get_temp_dir() . '/laravel-cqrs-tests-' . bin2hex(random_bytes(8));
 
         foreach ([
@@ -75,7 +73,7 @@ abstract class TestCase extends BaseTestCase
         $app->instance('config', new Repository([
             'cqrs' => array_replace_recursive(
                 require dirname(__DIR__) . '/config/cqrs.php',
-                $configOverrides
+                $configOverrides,
             ),
         ]));
 
@@ -90,25 +88,22 @@ abstract class TestCase extends BaseTestCase
         return $app;
     }
 
-    protected function bootPackage(Application $app): void
-    {
+    protected function bootPackage(Application $app): void {
         $app->register(LaravelCqrsServiceProvider::class);
         $app->boot();
     }
 
-    protected function makeArtisan(Application $app): ArtisanApplication
-    {
+    protected function makeArtisan(Application $app): ArtisanApplication {
         return new ArtisanApplication($app, $app->make(Dispatcher::class), 'testing');
     }
 
     /**
      * @param  array<string, string>  $prefixesToPaths
      */
-    protected function registerPsr4Autoloader(array $prefixesToPaths): void
-    {
+    protected function registerPsr4Autoloader(array $prefixesToPaths): void {
         $autoloader = static function (string $class) use ($prefixesToPaths): void {
             foreach ($prefixesToPaths as $prefix => $path) {
-                if (!str_starts_with($class, $prefix)) {
+                if ( ! str_starts_with($class, $prefix)) {
                     continue;
                 }
 
@@ -127,15 +122,14 @@ abstract class TestCase extends BaseTestCase
         $this->autoloaders[] = $autoloader;
     }
 
-    private function deleteDirectory(string $directory): void
-    {
-        if (!is_dir($directory)) {
+    private function deleteDirectory(string $directory): void {
+        if ( ! is_dir($directory)) {
             return;
         }
 
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
+            RecursiveIteratorIterator::CHILD_FIRST,
         );
 
         foreach ($iterator as $item) {

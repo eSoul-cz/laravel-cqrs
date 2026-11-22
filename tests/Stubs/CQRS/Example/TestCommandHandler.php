@@ -14,8 +14,7 @@ class TestCommandHandler implements CommandHandlerInterface
     /**
      * @param  TestCommand  $command
      */
-    public function handle(CommandInterface $command): string
-    {
+    public function handle(CommandInterface $command): string {
         return 'Discovered command handled';
     }
 }

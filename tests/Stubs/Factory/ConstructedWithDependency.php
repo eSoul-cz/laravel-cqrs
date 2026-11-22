@@ -8,5 +8,6 @@ final readonly class ConstructedWithDependency
 {
     public function __construct(
         public InjectedDependency $dependency,
-    ) {}
+    ) {
+    }
 }

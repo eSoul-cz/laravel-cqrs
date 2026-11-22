@@ -18,8 +18,7 @@ use Tests\TestCase;
 
 class FacadeTest extends TestCase
 {
-    public function test_command_bus_facade_dispatches_commands(): void
-    {
+    public function test_command_bus_facade_dispatches_commands(): void {
         $app = $this->createApplication([
             'discovery' => [
                 'enabled' => false,
@@ -37,8 +36,7 @@ class FacadeTest extends TestCase
         $this->assertSame('Handled!', CommandBus::dispatch(new TestingCommand()));
     }
 
-    public function test_command_bus_facade_register_handler_delegates_to_bound_bus(): void
-    {
+    public function test_command_bus_facade_register_handler_delegates_to_bound_bus(): void {
         $app = $this->createApplication([
             'discovery' => [
                 'enabled' => false,
@@ -53,8 +51,7 @@ class FacadeTest extends TestCase
         $this->assertSame('Handled!', $app->make(CommandBusInterface::class)->dispatch(new TestingCommand()));
     }
 
-    public function test_query_bus_facade_executes_queries(): void
-    {
+    public function test_query_bus_facade_executes_queries(): void {
         $app = $this->createApplication([
             'discovery' => [
                 'enabled' => false,
@@ -72,8 +69,7 @@ class FacadeTest extends TestCase
         $this->assertSame('Handled!', QueryBus::execute(new TestingQuery()));
     }
 
-    public function test_query_bus_facade_register_handler_delegates_to_bound_bus(): void
-    {
+    public function test_query_bus_facade_register_handler_delegates_to_bound_bus(): void {
         $app = $this->createApplication([
             'discovery' => [
                 'enabled' => false,
@@ -88,8 +84,7 @@ class FacadeTest extends TestCase
         $this->assertSame('Handled!', $app->make(QueryBusInterface::class)->execute(new TestingQuery()));
     }
 
-    public function test_facades_throw_when_no_root_is_set(): void
-    {
+    public function test_facades_throw_when_no_root_is_set(): void {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
 
