@@ -108,10 +108,6 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
      */
     private function loadManualRegistrations(string $type): array
     {
-        if (!in_array($type, ['commands', 'queries'], true)) {
-            throw new InvalidArgumentException("Invalid type '{$type}' for manual registrations. Expected 'commands' or 'queries'.");
-        }
-
         $interface = $type === 'commands' ? CommandInterface::class : QueryInterface::class;
         $handlerInterface = $type === 'commands' ? CommandHandlerInterface::class : QueryHandlerInterface::class;
 
@@ -139,8 +135,6 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
             }
         }
 
-        // Manually validated shape for phpstan
-        /** @phpstan-ignore return.type */
         return $config;
     }
 
