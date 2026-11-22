@@ -322,3 +322,18 @@ php artisan make:cqrs-query FindOrder --handler --return='array{id:int,number:st
 - Facades are class-based only; no alias is registered automatically.
 - If no handler is registered for a dispatched command or executed query, the underlying bus throws a runtime exception.
 - Handler discovery depends on the `esoul-cz/cqrs` attributes, so handlers must be annotated correctly.
+
+## Development
+
+Install the dependencies with `composer install` (the package does not commit `composer.lock`, so `composer update` resolves the newest ones), then use these Composer scripts:
+
+| Script | What it does |
+|--------|--------------|
+| `composer phpstan` | PHPStan level 10 over `src` and `config` |
+| `composer cs` | PHP-CS-Fixer dry run with the shared [`esoul-cz/coding-standard`](https://github.com/eSoul-cz/coding-standard) |
+| `composer cs:fix` | Fix code style violations |
+| `composer test` | PHPUnit |
+
+### Continuous integration
+
+The package supports PHP 8.5 and newer. The `Jenkinsfile` calls the shared `phpPackagePipeline` step, which runs `composer update`, `composer validate --strict`, PHPStan, the code style check, `composer audit` and PHPUnit on PHP 8.5. It then re-resolves the dependencies and runs the tests on PHP 8.6. A successful build of `master` triggers the Satis rebuild.
