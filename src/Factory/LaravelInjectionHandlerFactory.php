@@ -14,8 +14,7 @@ class LaravelInjectionHandlerFactory implements HandlerFactoryInterface
      *
      * @throws BindingResolutionException
      */
-    public function instantiate(string $handlerClass): object
-    {
+    public function instantiate(string $handlerClass): object {
         return app()->make($handlerClass);
     }
 }

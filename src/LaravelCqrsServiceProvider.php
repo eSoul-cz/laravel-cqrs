@@ -26,8 +26,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelCqrsServiceProvider extends PackageServiceProvider
 {
-    public function configurePackage(Package $package): void
-    {
+    public function configurePackage(Package $package): void {
         $package
             ->name('laravel-cqrs')
             ->hasConfigFile('cqrs')
@@ -37,13 +36,13 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
                 QueryMakeCommand::class,
                 QueryHandlerMakeCommand::class,
             )
-            ->hasInstallCommand(static fn (InstallCommand $command) => $command
-                ->publishConfigFile()
+            ->hasInstallCommand(
+                static fn (InstallCommand $command) => $command
+                    ->publishConfigFile(),
             );
     }
 
-    public function packageRegistered(): void
-    {
+    public function packageRegistered(): void {
         [
             'discover' => $discover,
             'cacheDirectory' => $cacheDirectory,
@@ -54,7 +53,7 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
         $commandsRegister = $this->loadManualRegistrations('commands');
         $queriesRegister = $this->loadManualRegistrations('queries');
 
-        if (!empty($cacheDirectory)) {
+        if ( ! empty($cacheDirectory)) {
             Discovery::setCacheDirectory($cacheDirectory);
         }
 
@@ -106,31 +105,30 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
      * @param  'commands'|'queries'  $type
      * @return ($type is 'commands' ? array<class-string<CommandInterface<mixed>>, class-string<CommandHandlerInterface>> : array<class-string<QueryInterface<mixed>>, class-string<QueryHandlerInterface>>)
      */
-    private function loadManualRegistrations(string $type): array
-    {
+    private function loadManualRegistrations(string $type): array {
         $interface = $type === 'commands' ? CommandInterface::class : QueryInterface::class;
         $handlerInterface = $type === 'commands' ? CommandHandlerInterface::class : QueryHandlerInterface::class;
 
         $config = config('cqrs.' . $type . '.register', []);
-        if (!is_array($config)) {
+        if ( ! is_array($config)) {
             throw new InvalidArgumentException('Invalid configuration: queries.register must be an array');
         }
 
         // Validate the array<class-string<QueryInterface>, class-string<QueryHandlerInterface>> structure
         foreach ($config as $queryClass => $handlerClass) {
-            if (!is_string($queryClass) || !is_string($handlerClass)) {
+            if ( ! is_string($queryClass) || ! is_string($handlerClass)) {
                 throw new InvalidArgumentException('Invalid query registration: both query and handler must be class strings');
             }
-            if (!class_exists($queryClass)) {
+            if ( ! class_exists($queryClass)) {
                 throw new InvalidArgumentException("Class '{$queryClass}' does not exist");
             }
-            if (!class_exists($handlerClass)) {
+            if ( ! class_exists($handlerClass)) {
                 throw new InvalidArgumentException("Handler class '{$handlerClass}' does not exist");
             }
-            if (!is_subclass_of($queryClass, $interface)) {
+            if ( ! is_subclass_of($queryClass, $interface)) {
                 throw new InvalidArgumentException("Class '{$queryClass}' must implement '{$interface}'");
             }
-            if (!is_subclass_of($handlerClass, $handlerInterface)) {
+            if ( ! is_subclass_of($handlerClass, $handlerInterface)) {
                 throw new InvalidArgumentException("Handler class '{$handlerClass}' must implement '{$handlerInterface}'");
             }
         }
@@ -141,8 +139,7 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
     /**
      * @return array{discover:bool, cacheDirectory:string, paths:array{base_namespace:non-empty-string, path:non-empty-string}[]}
      */
-    private function getDiscoveryConfig(): array
-    {
+    private function getDiscoveryConfig(): array {
         /** @var array{enabled?:bool, cache_dir?:string, paths?:array<string, array{base_namespace?:string, path?:string}>|null}|null $discoveryConfig */
         $discoveryConfig = config('cqrs.discovery');
 
@@ -160,7 +157,7 @@ class LaravelCqrsServiceProvider extends PackageServiceProvider
                     if (isset($config['base_namespace'], $config['path'])) {
                         $namespace = rtrim($config['base_namespace'], '\\');
                         $path = rtrim($config['path'], DIRECTORY_SEPARATOR);
-                        if (!empty($namespace) && !empty($path)) {
+                        if ( ! empty($namespace) && ! empty($path)) {
                             $discoverPaths[] = [
                                 'base_namespace' => $namespace,
                                 'path' => $path,

@@ -31,8 +31,7 @@ class QueryHandlerMakeCommand extends GeneratorCommand
 
     protected $type = 'QueryHandler';
 
-    public function handle(): bool
-    {
+    public function handle(): bool {
         try {
             return parent::handle() !== false;
             /** @phpstan-ignore catch.neverThrown */
@@ -43,8 +42,7 @@ class QueryHandlerMakeCommand extends GeneratorCommand
         }
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         $result = $this->laravel->call([$this, 'handle']);
 
         if (is_int($result)) {
@@ -54,13 +52,11 @@ class QueryHandlerMakeCommand extends GeneratorCommand
         return $result ? self::SUCCESS : self::FAILURE;
     }
 
-    protected function getStub(): string
-    {
+    protected function getStub(): string {
         return dirname(__DIR__) . '/stubs/queryHandler.stub';
     }
 
-    protected function rootNamespace(): string
-    {
+    protected function rootNamespace(): string {
         $namespace = config('cqrs.query_handlers.base_namespace');
 
         return is_string($namespace) && $namespace !== ''
@@ -68,8 +64,7 @@ class QueryHandlerMakeCommand extends GeneratorCommand
             : 'App\\Domain\\CQRS\\Query';
     }
 
-    protected function getPath($name): string
-    {
+    protected function getPath($name): string {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
         $path = config('cqrs.query_handlers.path');
@@ -80,8 +75,7 @@ class QueryHandlerMakeCommand extends GeneratorCommand
         return $basePath . DIRECTORY_SEPARATOR . ltrim(str_replace('\\', '/', $name), DIRECTORY_SEPARATOR) . '.php';
     }
 
-    protected function getNameInput(): string
-    {
+    protected function getNameInput(): string {
         $name = parent::getNameInput();
         if (str_ends_with($name, 'Handler')) {
             return $name;
@@ -93,20 +87,20 @@ class QueryHandlerMakeCommand extends GeneratorCommand
         return $name . 'QueryHandler';
     }
 
-    protected function buildClass($name): string
-    {
+    protected function buildClass($name): string {
         $replace = $this->buildFactoryReplacements();
 
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace),
+            array_values($replace),
+            parent::buildClass($name),
         );
     }
 
     /**
      * @return array<string, string>
      */
-    protected function buildFactoryReplacements(): array
-    {
+    protected function buildFactoryReplacements(): array {
         $replacements = [];
 
         $queryName = $this->getFullQueryName();
@@ -129,8 +123,7 @@ class QueryHandlerMakeCommand extends GeneratorCommand
     /**
      * @return class-string<QueryInterface<mixed>>
      */
-    private function getFullQueryName(): string
-    {
+    private function getFullQueryName(): string {
         $queryNamespace = config('cqrs.queries.base_namespace');
         $queryNamespace = is_string($queryNamespace) && $queryNamespace !== ''
             ? trim($queryNamespace, '\\')
@@ -145,10 +138,10 @@ class QueryHandlerMakeCommand extends GeneratorCommand
 
         $class = ltrim($class, '\\');
 
-        if (!class_exists($class)) {
+        if ( ! class_exists($class)) {
             throw new InvalidArgumentException("The specified query class '{$class}' does not exist.");
         }
-        if (!is_a($class, QueryInterface::class, true)) {
+        if ( ! is_a($class, QueryInterface::class, true)) {
             throw new InvalidArgumentException("The specified query class '{$class}' does not implement QueryInterface.");
         }
 

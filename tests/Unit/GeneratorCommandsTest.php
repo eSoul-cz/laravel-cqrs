@@ -14,8 +14,7 @@ use Tests\TestCase;
 
 class GeneratorCommandsTest extends TestCase
 {
-    public function test_make_cqrs_command_uses_configured_namespaces_and_paths(): void
-    {
+    public function test_make_cqrs_command_uses_configured_namespaces_and_paths(): void {
         $app = $this->createApplication();
         $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
         $this->registerPsr4Autoloader([
@@ -45,8 +44,7 @@ class GeneratorCommandsTest extends TestCase
         $this->assertStringContainsString('public function handle(CommandInterface $command) : string', file_get_contents($handlerPath) ?: '');
     }
 
-    public function test_make_cqrs_query_uses_configured_namespaces_and_paths(): void
-    {
+    public function test_make_cqrs_query_uses_configured_namespaces_and_paths(): void {
         $app = $this->createApplication();
         $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
         $this->registerPsr4Autoloader([
@@ -75,8 +73,7 @@ class GeneratorCommandsTest extends TestCase
         $this->assertStringContainsString('public function handle(QueryInterface $query): array', file_get_contents($handlerPath) ?: '');
     }
 
-    public function test_make_cqrs_command_handler_accepts_command_option_value(): void
-    {
+    public function test_make_cqrs_command_handler_accepts_command_option_value(): void {
         $app = $this->createApplication();
         $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
         $this->registerPsr4Autoloader([
@@ -105,8 +102,7 @@ class GeneratorCommandsTest extends TestCase
         $this->assertStringContainsString('use Tests\\Generated\\Command\\ShipOrderCommand;', file_get_contents($handlerPath) ?: '');
     }
 
-    public function test_make_cqrs_query_handler_accepts_query_option_value(): void
-    {
+    public function test_make_cqrs_query_handler_accepts_query_option_value(): void {
         $app = $this->createApplication();
         $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
         $this->registerPsr4Autoloader([
@@ -135,8 +131,7 @@ class GeneratorCommandsTest extends TestCase
         $this->assertStringContainsString('use Tests\\Generated\\Query\\LookupOrderQuery;', file_get_contents($handlerPath) ?: '');
     }
 
-    public function test_make_cqrs_command_handler_fails_cleanly_for_invalid_command_class(): void
-    {
+    public function test_make_cqrs_command_handler_fails_cleanly_for_invalid_command_class(): void {
         $app = $this->createApplication();
         $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
         $this->registerPsr4Autoloader([
@@ -156,8 +151,7 @@ class GeneratorCommandsTest extends TestCase
         $this->assertStringContainsString("The specified command class 'Tests\\Generated\\Command\\MissingCommand' does not exist.", $artisan->output());
     }
 
-    public function test_make_cqrs_query_handler_fails_cleanly_for_invalid_query_class(): void
-    {
+    public function test_make_cqrs_query_handler_fails_cleanly_for_invalid_query_class(): void {
         $app = $this->createApplication();
         $app['config']->set('cqrs', array_replace_recursive($app['config']->get('cqrs'), $this->generatorConfig($app->basePath(), $app->storagePath('framework/cache/discovery'))));
         $this->registerPsr4Autoloader([
@@ -180,8 +174,7 @@ class GeneratorCommandsTest extends TestCase
     /**
      * @return array<string, mixed>
      */
-    private function generatorConfig(string $basePath, string $cacheDirectory): array
-    {
+    private function generatorConfig(string $basePath, string $cacheDirectory): array {
         return [
             'discovery' => [
                 'enabled' => false,
@@ -209,8 +202,7 @@ class GeneratorCommandsTest extends TestCase
         ];
     }
 
-    private function makeGeneratorArtisan(Application $app): ArtisanApplication
-    {
+    private function makeGeneratorArtisan(Application $app): ArtisanApplication {
         $artisan = $this->makeArtisan($app);
         $artisan->resolveCommands([
             CommandMakeCommand::class,

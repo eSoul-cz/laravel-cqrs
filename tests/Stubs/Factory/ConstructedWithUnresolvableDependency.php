@@ -8,5 +8,6 @@ final readonly class ConstructedWithUnresolvableDependency
 {
     public function __construct(
         public UnresolvableDependency $dependency,
-    ) {}
+    ) {
+    }
 }

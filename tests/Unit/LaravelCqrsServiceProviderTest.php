@@ -22,8 +22,7 @@ use Tests\TestCase;
 #[Group('laravel')]
 class LaravelCqrsServiceProviderTest extends TestCase
 {
-    public function test_provider_registers_singleton_buses_and_discovers_handlers(): void
-    {
+    public function test_provider_registers_singleton_buses_and_discovers_handlers(): void {
         $app = $this->createApplication($this->discoveryConfig());
         $this->bootPackage($app);
 
@@ -36,8 +35,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         $this->assertSame('Discovered query handled', $queryBus->execute(new TestQuery()));
     }
 
-    public function test_provider_registers_manual_handlers(): void
-    {
+    public function test_provider_registers_manual_handlers(): void {
         $app = $this->createApplication([
             'discovery' => [
                 'enabled' => false,
@@ -61,8 +59,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         $this->assertSame('Handled!', $app->make(QueryBusInterface::class)->execute(new TestingQuery()));
     }
 
-    public function test_provider_uses_configured_discovery_cache_directory(): void
-    {
+    public function test_provider_uses_configured_discovery_cache_directory(): void {
         $cacheDirectory = $this->temporaryCacheDirectory();
         $app = $this->createApplication([
             ...$this->discoveryConfig(),
@@ -88,8 +85,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         $this->assertCount(2, $cacheFiles);
     }
 
-    public function test_provider_rejects_invalid_discovery_path_configuration(): void
-    {
+    public function test_provider_rejects_invalid_discovery_path_configuration(): void {
         $app = $this->createApplication([
             'discovery' => [
                 'enabled' => true,
@@ -108,8 +104,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         $app->register(LaravelCqrsServiceProvider::class);
     }
 
-    public function test_provider_rejects_invalid_command_registration(): void
-    {
+    public function test_provider_rejects_invalid_command_registration(): void {
         $app = $this->createApplication([
             'commands' => [
                 'register' => [
@@ -124,8 +119,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         $app->register(LaravelCqrsServiceProvider::class);
     }
 
-    public function test_provider_rejects_invalid_query_registration(): void
-    {
+    public function test_provider_rejects_invalid_query_registration(): void {
         $app = $this->createApplication([
             'queries' => [
                 'register' => [
@@ -143,8 +137,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
     /**
      * @return array<string, mixed>
      */
-    private function discoveryConfig(): array
-    {
+    private function discoveryConfig(): array {
         return [
             'discovery' => [
                 'enabled' => true,
@@ -159,8 +152,7 @@ class LaravelCqrsServiceProviderTest extends TestCase
         ];
     }
 
-    private function temporaryCacheDirectory(): string
-    {
+    private function temporaryCacheDirectory(): string {
         return $this->app instanceof Application
             ? $this->app->storagePath('framework/cache/discovery')
             : sys_get_temp_dir() . '/laravel-cqrs-cache-' . bin2hex(random_bytes(8));

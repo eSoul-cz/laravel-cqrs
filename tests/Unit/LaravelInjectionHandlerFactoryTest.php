@@ -13,24 +13,22 @@ use Tests\TestCase;
 
 class LaravelInjectionHandlerFactoryTest extends TestCase
 {
-    public function test_instantiate_resolves_class_from_laravel_container(): void
-    {
+    public function test_instantiate_resolves_class_from_laravel_container(): void {
         $app = $this->createApplication();
         $dependency = new InjectedDependency('resolved');
         $app->instance(InjectedDependency::class, $dependency);
 
-        $instance = (new LaravelInjectionHandlerFactory())->instantiate(ConstructedWithDependency::class);
+        $instance = new LaravelInjectionHandlerFactory()->instantiate(ConstructedWithDependency::class);
 
         $this->assertInstanceOf(ConstructedWithDependency::class, $instance);
         $this->assertSame($dependency, $instance->dependency);
     }
 
-    public function test_instantiate_throws_for_unresolvable_dependency(): void
-    {
+    public function test_instantiate_throws_for_unresolvable_dependency(): void {
         $this->createApplication();
 
         $this->expectException(BindingResolutionException::class);
 
-        (new LaravelInjectionHandlerFactory())->instantiate(ConstructedWithUnresolvableDependency::class);
+        new LaravelInjectionHandlerFactory()->instantiate(ConstructedWithUnresolvableDependency::class);
     }
 }
